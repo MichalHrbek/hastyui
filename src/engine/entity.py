@@ -4,7 +4,7 @@ from typing import Self
 import pygame as pg
 
 class Entity:
-    def __init__(self, children: list[Self] | None = None):
+    def __init__(self, children: list['Entity'] | None = None):
         self.children = children if children is not None else []
 
     def _event(self, e: Event):

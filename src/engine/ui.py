@@ -1,5 +1,6 @@
-from engine.entity import TransformedEntity
+from engine.entity import TransformedEntity, Entity
 from engine.transform import Transform
+from typing import Callable
 import pygame as pg
 
 class Label(TransformedEntity):
@@ -67,3 +68,26 @@ class HBox(TransformedEntity):
 class Padding(TransformedEntity):
     def __init__(self, width: float, height: float):
         super().__init__(None, Transform(pg.Rect(0,0,width,height)))
+
+DynPos = Callable[[],tuple[float,float] | tuple[int,int] | pg.Vector2] | None
+class Anchor(Entity):
+    def __init__(self, children = None, size: DynPos = None, topleft: DynPos = None, topright: DynPos = None, bottomleft: DynPos = None, bottomright: DynPos = None):
+        super().__init__(children)
+        self.size = size
+        self.topleft = topleft
+        self.topright = topright
+        self.bottomleft = bottomleft
+        self.bottomright = bottomright
+    def _render(self, screen):
+        for i in self.children:
+            if self.size:
+                i.transform.rect.size = self.size()
+            if self.topleft:
+                i.transform.rect.topleft = self.topleft()
+            if self.topright:
+                i.transform.rect.topright = self.topright()
+            if self.bottomleft:
+                i.transform.rect.bottomleft = self.bottomleft()
+            if self.bottomright:
+                i.transform.rect.bottomright = self.bottomright()
+        super()._render(screen)

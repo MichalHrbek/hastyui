@@ -15,6 +15,9 @@ root = Entity([
             Padding(100,100),
             Label(text="World!"),
         ]),
+        Anchor([Label(text="TR")], topright=lambda: screen.get_rect().topright),
+        Anchor([Label(text="BL")], bottomleft=lambda: screen.get_rect().bottomleft),
+        Anchor([Label(text="BR")], bottomright=lambda: screen.get_rect().bottomright),
     ])
 
 while running:

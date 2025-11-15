@@ -39,6 +39,11 @@ class TransformedEntity(Entity):
         if e.e.type in [pg.MOUSEMOTION, pg.MOUSEBUTTONUP, pg.MOUSEBUTTONDOWN]:
             e.e.tpos = self.transform.transform_point(e.e.pos)
             self._transformed_event(e)
+    
+    # def _render(self, screen):
+    #     super()._render(screen)
+    #     pg.draw.rect(screen, "green", self.transform.rect, 1)
+
 
     def _transformed_event(self, e: Event):
         pass

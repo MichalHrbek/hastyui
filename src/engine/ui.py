@@ -2,9 +2,10 @@ from engine.entity import TransformedEntity, Entity
 from engine.transform import Transform
 from typing import Callable
 import pygame as pg
+from engine.text import draw_text, TextLike
 
 class Label(TransformedEntity):
-    def __init__(self, children = None, transform = None, font: pg.font.Font | None = None, auto_rezise = True, text: str = "", color = "cornsilk"):
+    def __init__(self, children = None, transform = None, font: pg.font.Font | None = None, auto_rezise = True, text: TextLike = "", color = "cornsilk"):
         super().__init__(children, transform)
         self.surface = pg.Surface(self.transform.rect.size, pg.SRCALPHA)
         self.auto_rezise = auto_rezise
@@ -16,30 +17,21 @@ class Label(TransformedEntity):
         self.text = text
     
     @property
-    def text(self) -> str:
+    def text(self) -> TextLike:
         return self._text
     
     @text.setter
-    def text(self, value: str):
+    def text(self, value: TextLike):
         self._text = value
         self.redraw()
 
     def redraw(self):
-        lines = self.text.split('\n')
         if self.auto_rezise:
-            mh = self.font.get_linesize()*len(lines)+1 # (1 if self.font.underline else 0)
-            mw = 0
-            for i in lines:
-                mw = max(mw, self.font.size(i)[0])
-            
-            if mh > self.surface.get_height() or mw > self.surface.get_width():
-                self.surface = pg.Surface((mw,mh), pg.SRCALPHA)
-            
-            self.transform.rect.size = (mw,mh)
-        
-        self.surface.fill((0,0,0,0))
-        for i, line in enumerate(self._text.split('\n')):
-            self.surface.blit(self.font.render(line, 1, self.color), (0,self.font.get_linesize()*i))
+            self.surface = draw_text(self.text, self.font, self.color)
+            self.transform.rect.size = self.surface.get_size()
+        else:
+            self.surface.fill((0,0,0,0))
+            self.surface.blit(draw_text(self.text, self.font, self.color))
     
     def _render(self, screen):
         super()._render(screen)
@@ -71,15 +63,18 @@ class Padding(TransformedEntity):
 
 DynPos = Callable[[],tuple[float,float] | tuple[int,int] | pg.Vector2] | None
 class Anchor(Entity):
-    def __init__(self, children = None, size: DynPos = None, topleft: DynPos = None, topright: DynPos = None, bottomleft: DynPos = None, bottomright: DynPos = None):
+    def __init__(self, children = None, size: DynPos = None, topleft: DynPos = None, topright: DynPos = None, bottomleft: DynPos = None, bottomright: DynPos = None, center: DynPos = None):
         super().__init__(children)
         self.size = size
         self.topleft = topleft
         self.topright = topright
         self.bottomleft = bottomleft
         self.bottomright = bottomright
+        self.center = center
     def _render(self, screen):
         for i in self.children:
+            if not isinstance(i, TransformedEntity):
+                continue
             if self.size:
                 i.transform.rect.size = self.size()
             if self.topleft:
@@ -90,4 +85,6 @@ class Anchor(Entity):
                 i.transform.rect.bottomleft = self.bottomleft()
             if self.bottomright:
                 i.transform.rect.bottomright = self.bottomright()
+            if self.center:
+                i.transform.rect.center = self.center()
         super()._render(screen)

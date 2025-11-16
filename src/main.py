@@ -24,10 +24,10 @@ root = Entity([
             Padding(100,100),
             Label(text="Padding!"),
         ]),
-        Anchor([Label(text="TR")], topright=lambda: screen.get_rect().topright),
-        Anchor([Label(text="BL")], bottomleft=lambda: screen.get_rect().bottomleft),
-        Anchor([Label(text="BR")], bottomright=lambda: screen.get_rect().bottomright),
-        Anchor([Label(text=rich_text)], center=lambda: screen.get_rect().center),
+        Label(text="TR", anchor = Anchor(topright=lambda: screen.get_rect().topright)),
+        Label(text="BL", anchor = Anchor(bottomleft=lambda: screen.get_rect().bottomleft)),
+        Label(text="BR", anchor = Anchor(bottomright=lambda: screen.get_rect().bottomright)),
+        StyledBox([PadBox([Label(text=rich_text, color="black")], padding=25)], bg_color="pink", anchor = Anchor(center=lambda: screen.get_rect().center)),
     ])
 
 while running:
